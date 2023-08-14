@@ -13,35 +13,46 @@ const Dashboard = () => {
 
   /// caller
   const loadDepts = async () => {
+    setLoading(true);
     try {
-      let depts;
-      setLoading(true);
-      await Promise.all((depts = await getDatas()));
+      let depts = await getDatas();
+      setDepartments(depts);
+      //let promises = await Promise.all([depts]);
       console.log("depts : ", depts);
-      setLoading(false);
     } catch (error) {
       console.log(error);
     }
+    setLoading(false);
+    return departments;
   };
 
-  const loadBatches = async () => {
+  const loadBatches = async (departments) => {
+    setLoading(true);
     try {
-      setLoading(true);
-      getBatches().then((res) => {
-        // setDepartments(res);
-        console.log(res);
+      getBatches(departments).then((res) => {
+        setDepartments(res);
+        console.log("HAHAH: ", res);
       });
-      setLoading(false);
     } catch (error) {
       console.log(error);
-      setLoading(false);
     }
+    setLoading(false);
   };
   /// Loader Hook
   useEffect(() => {
-    loadDepts();
-    loadBatches();
-  }, [loading]);
+    setLoading(true);
+    getDatas()
+      .then((res) => {
+        setDepartments(res);
+        getBatches(res).then((batch) => {
+          setBatches(batch);
+          console.log("Batches: ", batch);
+        });
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  }, []);
 
   return (
     <>
